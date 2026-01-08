@@ -447,6 +447,14 @@ func StartServer(
 	}
 	connectorID := tunnelConfig.ClientConfig.ConnectorID
 
+	if quickTunnelURL != "" && quickURLSink != nil {
+		rid, _ := c.Context.Value("quick_request_id").(string)
+		if rid == "" {
+			rid = connectorID.String()
+		}
+		quickURLSink.OnQuickTunnelURL(rid, quickTunnelURL)
+	}
+
 	// Disable ICMP packet routing for quick tunnels
 	if quickTunnelURL != "" {
 		tunnelConfig.ICMPRouterServer = nil
