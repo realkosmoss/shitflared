@@ -3,8 +3,7 @@
 Cloudflare Tunnel Api for quick tunnels only
 
 ### Build
-To build cloudflared locally run `make cloudflared`
-Or run `go build ./cmd/cloudflared/`
+To build cloudflared locally run `make cloudflared` or run `go build ./cmd/cloudflared/`
 
 ## Tunnel API
 
