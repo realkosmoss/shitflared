@@ -1,226 +1,435 @@
 package main
 
 import (
+	"bytes"
+	"context"
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
-	"strings"
+	"os/exec"
+	"os/signal"
+	"sync"
+	"syscall"
 	"time"
 
-	"github.com/getsentry/sentry-go"
-	"github.com/urfave/cli/v2"
 	"go.uber.org/automaxprocs/maxprocs"
 
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/access"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
-	cfdflags "github.com/cloudflare/cloudflared/cmd/cloudflared/flags"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/proxydns"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/tail"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/tunnel"
-	"github.com/cloudflare/cloudflared/cmd/cloudflared/updater"
-	"github.com/cloudflare/cloudflared/config"
-	"github.com/cloudflare/cloudflared/logger"
 	"github.com/cloudflare/cloudflared/metrics"
-	"github.com/cloudflare/cloudflared/overwatch"
-	"github.com/cloudflare/cloudflared/token"
-	"github.com/cloudflare/cloudflared/tracing"
-	"github.com/cloudflare/cloudflared/watcher"
-)
-
-const (
-	versionText = "Print the version"
 )
 
 var (
 	Version   = "DEV"
 	BuildTime = "unknown"
 	BuildType = ""
-	// Mostly network errors that we don't want reported back to Sentry, this is done by substring match.
-	ignoredErrors = []string{
-		"connection reset by peer",
-		"An existing connection was forcibly closed by the remote host.",
-		"use of closed connection",
-		"You need to enable Argo Smart Routing",
-		"3001 connection closed",
-		"3002 connection dropped",
-		"rpc exception: dial tcp",
-		"rpc exception: EOF",
+)
+
+type quickTunnelRequest struct {
+	Host  string `json:"host"`
+	Port  int    `json:"port"`
+	Proxy string `json:"proxy,omitempty"`
+}
+
+type quickTunnelResponse struct {
+	ID       string `json:"id"`
+	URL      string `json:"url,omitempty"`
+	Status   string `json:"status"`
+	Error    string `json:"error,omitempty"`
+	PID      int    `json:"pid,omitempty"`
+	Target   string `json:"target,omitempty"`
+	Protocol string `json:"protocol,omitempty"`
+	Proxy    string `json:"proxy,omitempty"`
+}
+
+type workerCallback struct {
+	ID     string `json:"id"`
+	URL    string `json:"url,omitempty"`
+	Status string `json:"status,omitempty"`
+	Error  string `json:"error,omitempty"`
+}
+
+type tunnelHandle struct {
+	id     string
+	url    string
+	target string
+	proxy  string
+
+	protocol string
+	cmd      *exec.Cmd
+	done     chan struct{}
+
+	mu  sync.Mutex
+	err error
+}
+
+type quickURLHub struct {
+	mu sync.Mutex
+	ch map[string]chan string
+}
+
+func newQuickURLHub() *quickURLHub { return &quickURLHub{ch: make(map[string]chan string)} }
+
+func (h *quickURLHub) register(id string) chan string {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	c := make(chan string, 1)
+	h.ch[id] = c
+	return c
+}
+
+func (h *quickURLHub) unregister(id string) {
+	h.mu.Lock()
+	defer h.mu.Unlock()
+	delete(h.ch, id)
+}
+
+func (h *quickURLHub) push(id, url string) {
+	h.mu.Lock()
+	c := h.ch[id]
+	h.mu.Unlock()
+	if c != nil {
+		select {
+		case c <- url:
+		default:
+		}
 	}
+}
+
+var (
+	serverCtx    context.Context
+	serverCancel context.CancelFunc
+
+	hub = newQuickURLHub()
+
+	runningMu sync.Mutex
+	running   = map[string]*tunnelHandle{}
 )
 
 func main() {
-	// FIXME: TUN-8148: Disable QUIC_GO ECN due to bugs in proper detection if supported
+	if isWorkerMode() {
+		os.Exit(workerMain())
+	}
+
 	os.Setenv("QUIC_GO_DISABLE_ECN", "1")
 	metrics.RegisterBuildInfo(BuildType, BuildTime, Version)
 	_, _ = maxprocs.Set()
-	bInfo := cliutil.GetBuildInfo(BuildType, Version)
 
-	// Graceful shutdown channel used by the app. When closed, app must terminate gracefully.
-	// Windows service manager closes this channel when it receives stop command.
-	graceShutdownC := make(chan struct{})
+	serverCtx, serverCancel = context.WithCancel(context.Background())
 
-	cli.VersionFlag = &cli.BoolFlag{
-		Name:    "version",
-		Aliases: []string{"v", "V"},
-		Usage:   versionText,
+	mux := http.NewServeMux()
+	mux.HandleFunc("/tunnel/quick", handleStartQuickTunnel)
+	mux.HandleFunc("/tunnel/stop", handleStopTunnel)
+	mux.HandleFunc("/tunnel/list", handleListTunnels)
+
+	mux.HandleFunc("/internal/quick-url", handleWorkerCallback)
+
+	srv := &http.Server{Addr: ":8787", Handler: mux}
+	go func() { _ = srv.ListenAndServe() }()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+	<-sig
+
+	serverCancel()
+
+	runningMu.Lock()
+	for _, h := range running {
+		if h != nil && h.cmd != nil && h.cmd.Process != nil {
+			_ = h.cmd.Process.Kill()
+		}
+	}
+	runningMu.Unlock()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+	_ = srv.Shutdown(ctx)
+}
+
+func handleStartQuickTunnel(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
 
-	app := &cli.App{}
-	app.Name = "cloudflared"
-	app.Usage = "Cloudflare's command-line tool and agent"
-	app.UsageText = "cloudflared [global options] [command] [command options]"
-	app.Copyright = fmt.Sprintf(
-		`(c) %d Cloudflare Inc.
-   Your installation of cloudflared software constitutes a symbol of your signature indicating that you accept
-   the terms of the Apache License Version 2.0 (https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/license),
-   Terms (https://www.cloudflare.com/terms/) and Privacy Policy (https://www.cloudflare.com/privacypolicy/).`,
-		time.Now().Year(),
+	var req quickTunnelRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if req.Host == "" || req.Port <= 0 || req.Port > 65535 {
+		http.Error(w, "invalid host/port", http.StatusBadRequest)
+		return
+	}
+
+	id := randID(12)
+	target := fmt.Sprintf("%s:%d", req.Host, req.Port)
+
+	protocol := "quic"
+	if req.Proxy != "" {
+		protocol = "http2"
+	}
+
+	urlCh := hub.register(id)
+	defer hub.unregister(id)
+
+	exe, err := os.Executable()
+	if err != nil {
+		writeJSONStatus(w, 500, quickTunnelResponse{ID: id, Status: "error", Error: err.Error()})
+		return
+	}
+
+	cbURL := "http://127.0.0.1:8787/internal/quick-url"
+
+	cmd := exec.Command(exe,
+		"--worker",
+		"--id", id,
+		"--target", target,
+		"--protocol", protocol,
+		"--callback", cbURL,
 	)
-	app.Version = fmt.Sprintf("%s (built %s%s)", Version, BuildTime, bInfo.GetBuildTypeMsg())
-	app.Description = `cloudflared connects your machine or user identity to Cloudflare's global network.
-	You can use it to authenticate a session to reach an API behind Access, route web traffic to this machine,
-	and configure access control.
 
-	See https://developers.cloudflare.com/cloudflare-one/connections/connect-apps for more in-depth documentation.`
-	app.Flags = flags()
-	app.Action = action(graceShutdownC)
-	app.Commands = commands(cli.ShowVersion)
-
-	tunnel.Init(bInfo, graceShutdownC) // we need this to support the tunnel sub command...
-	access.Init(graceShutdownC, Version)
-	updater.Init(bInfo)
-	tracing.Init(Version)
-	token.Init(Version)
-	tail.Init(bInfo)
-	runApp(app, graceShutdownC)
-}
-
-func commands(version func(c *cli.Context)) []*cli.Command {
-	cmds := []*cli.Command{
-		{
-			Name:   "update",
-			Action: cliutil.ConfiguredAction(updater.Update),
-			Usage:  "Update the agent if a new version exists",
-			Flags: []cli.Flag{
-				&cli.BoolFlag{
-					Name:  "beta",
-					Usage: "specify if you wish to update to the latest beta version",
-				},
-				&cli.BoolFlag{
-					Name:   cfdflags.Force,
-					Usage:  "specify if you wish to force an upgrade to the latest version regardless of the current version",
-					Hidden: true,
-				},
-				&cli.BoolFlag{
-					Name:   "staging",
-					Usage:  "specify if you wish to use the staging url for updating",
-					Hidden: true,
-				},
-				&cli.StringFlag{
-					Name:   "version",
-					Usage:  "specify a version you wish to upgrade or downgrade to",
-					Hidden: false,
-				},
-			},
-			Description: `Looks for a new version on the official download server.
-If a new version exists, updates the agent binary and quits.
-Otherwise, does nothing.
-
-To determine if an update happened in a script, check for error code 11.`,
-		},
-		{
-			Name: "version",
-			Action: func(c *cli.Context) (err error) {
-				if c.Bool("short") {
-					fmt.Println(strings.Split(c.App.Version, " ")[0])
-					return nil
-				}
-				version(c)
-				return nil
-			},
-			Usage:       versionText,
-			Description: versionText,
-			Flags: []cli.Flag{
-				&cli.BoolFlag{
-					Name:    "short",
-					Aliases: []string{"s"},
-					Usage:   "print just the version number",
-				},
-			},
-		},
+	cmd.Env = append(os.Environ(),
+		"QUICK_REQUEST_ID="+id,
+	)
+	if req.Proxy != "" {
+		cmd.Env = append(cmd.Env,
+			"HTTP_PROXY="+req.Proxy,
+			"HTTPS_PROXY="+req.Proxy,
+			"ALL_PROXY="+req.Proxy,
+			"NO_PROXY=127.0.0.1,localhost",
+		)
 	}
-	cmds = append(cmds, tunnel.Commands()...)
-	cmds = append(cmds, proxydns.Command(false))
-	cmds = append(cmds, access.Commands()...)
-	cmds = append(cmds, tail.Command())
-	return cmds
-}
 
-func flags() []cli.Flag {
-	flags := tunnel.Flags()
-	return append(flags, access.Flags()...)
-}
+	h := &tunnelHandle{
+		id:       id,
+		target:   target,
+		proxy:    req.Proxy,
+		protocol: protocol,
+		cmd:      cmd,
+		done:     make(chan struct{}),
+	}
 
-func isEmptyInvocation(c *cli.Context) bool {
-	return c.NArg() == 0 && c.NumFlags() == 0
-}
+	runningMu.Lock()
+	running[id] = h
+	runningMu.Unlock()
 
-func action(graceShutdownC chan struct{}) cli.ActionFunc {
-	return cliutil.ConfiguredAction(func(c *cli.Context) (err error) {
-		if isEmptyInvocation(c) {
-			return handleServiceMode(c, graceShutdownC)
-		}
-		func() {
-			defer sentry.Recover()
-			err = tunnel.TunnelCommand(c)
-		}()
-		if err != nil {
-			captureError(err)
-		}
-		return err
-	})
-}
+	if err := cmd.Start(); err != nil {
+		runningMu.Lock()
+		delete(running, id)
+		runningMu.Unlock()
 
-// In order to keep the amount of noise sent to Sentry low, typical network errors can be filtered out here by a substring match.
-func captureError(err error) {
-	errorMessage := err.Error()
-	for _, ignoredErrorMessage := range ignoredErrors {
-		if strings.Contains(errorMessage, ignoredErrorMessage) {
+		writeJSONStatus(w, 500, quickTunnelResponse{ID: id, Status: "error", Error: err.Error()})
+		return
+	}
+
+	go func() {
+		defer close(h.done)
+		err := cmd.Wait()
+		h.mu.Lock()
+		h.err = err
+		h.mu.Unlock()
+	}()
+
+	select {
+	case url := <-urlCh:
+		h.mu.Lock()
+		h.url = url
+		h.mu.Unlock()
+		writeJSON(w, quickTunnelResponse{
+			ID:       id,
+			URL:      url,
+			Status:   "started",
+			PID:      cmd.Process.Pid,
+			Target:   target,
+			Protocol: protocol,
+			Proxy:    req.Proxy,
+		})
+		return
+
+	case <-h.done:
+		h.mu.Lock()
+		e := h.err
+		h.mu.Unlock()
+
+		runningMu.Lock()
+		delete(running, id)
+		runningMu.Unlock()
+
+		if e == nil {
+			writeJSON(w, quickTunnelResponse{ID: id, Status: "stopped"})
 			return
 		}
+		writeJSONStatus(w, 500, quickTunnelResponse{ID: id, Status: "error", Error: e.Error()})
+		return
+
+	case <-time.After(30 * time.Second):
+		if cmd.Process != nil {
+			_ = cmd.Process.Kill()
+		}
+		writeJSONStatus(w, http.StatusGatewayTimeout, quickTunnelResponse{
+			ID:     id,
+			Status: "timeout",
+			Error:  "timed out waiting for quick tunnel url",
+		})
+		return
 	}
-	sentry.CaptureException(err)
 }
 
-// cloudflared was started without any flags
-func handleServiceMode(c *cli.Context, shutdownC chan struct{}) error {
-	log := logger.CreateLoggerFromContext(c, logger.DisableTerminalLog)
-
-	// start the main run loop that reads from the config file
-	f, err := watcher.NewFile()
-	if err != nil {
-		log.Err(err).Msg("Cannot load config file")
-		return err
+func handleStopTunnel(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
 	}
 
-	configPath := config.FindOrCreateConfigPath()
-	configManager, err := config.NewFileManager(f, configPath, log)
-	if err != nil {
-		log.Err(err).Msg("Cannot setup config file for monitoring")
-		return err
+	var body struct {
+		ID string `json:"id"`
 	}
-	log.Info().Msgf("monitoring config file at: %s", configPath)
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil || body.ID == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
 
-	serviceCallback := func(t string, name string, err error) {
+	runningMu.Lock()
+	h := running[body.ID]
+	runningMu.Unlock()
+
+	if h == nil {
+		writeJSONStatus(w, http.StatusNotFound, quickTunnelResponse{ID: body.ID, Status: "not_found"})
+		return
+	}
+
+	if h.cmd != nil && h.cmd.Process != nil {
+		_ = h.cmd.Process.Kill()
+	}
+
+	select {
+	case <-h.done:
+	case <-time.After(5 * time.Second):
+	}
+
+	runningMu.Lock()
+	delete(running, body.ID)
+	runningMu.Unlock()
+
+	writeJSON(w, quickTunnelResponse{ID: body.ID, Status: "stopped"})
+}
+
+func handleListTunnels(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	type item struct {
+		ID       string `json:"id"`
+		URL      string `json:"url,omitempty"`
+		Status   string `json:"status"`
+		Error    string `json:"error,omitempty"`
+		PID      int    `json:"pid,omitempty"`
+		Target   string `json:"target,omitempty"`
+		Protocol string `json:"protocol,omitempty"`
+		Proxy    string `json:"proxy,omitempty"`
+	}
+
+	runningMu.Lock()
+	out := make([]item, 0, len(running))
+	for id, h := range running {
+		h.mu.Lock()
+		url := h.url
+		err := h.err
+		h.mu.Unlock()
+
+		st := "running"
+		e := ""
 		if err != nil {
-			log.Err(err).Msgf("%s service: %s encountered an error", t, name)
+			st = "error"
+			e = err.Error()
 		}
-	}
-	serviceManager := overwatch.NewAppManager(serviceCallback)
 
-	appService := NewAppService(configManager, serviceManager, shutdownC, log)
-	if err := appService.Run(); err != nil {
-		log.Err(err).Msg("Failed to start app service")
+		pid := 0
+		if h.cmd != nil && h.cmd.Process != nil {
+			pid = h.cmd.Process.Pid
+		}
+
+		out = append(out, item{
+			ID:       id,
+			URL:      url,
+			Status:   st,
+			Error:    e,
+			PID:      pid,
+			Target:   h.target,
+			Protocol: h.protocol,
+			Proxy:    h.proxy,
+		})
+	}
+	runningMu.Unlock()
+
+	writeJSON(w, out)
+}
+
+func handleWorkerCallback(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		w.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	var cb workerCallback
+	if err := json.NewDecoder(r.Body).Decode(&cb); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if cb.ID == "" {
+		http.Error(w, "missing id", http.StatusBadRequest)
+		return
+	}
+
+	runningMu.Lock()
+	h := running[cb.ID]
+	runningMu.Unlock()
+
+	if h != nil {
+		h.mu.Lock()
+		if cb.Status == "error" && cb.Error != "" {
+			h.err = fmt.Errorf("%s", cb.Error)
+		}
+		if cb.URL != "" {
+			h.url = cb.URL
+			hub.push(cb.ID, cb.URL)
+		}
+		h.mu.Unlock()
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func randID(nBytes int) string {
+	b := make([]byte, nBytes)
+	_, _ = rand.Read(b)
+	return hex.EncodeToString(b)
+}
+
+func writeJSON(w http.ResponseWriter, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(v)
+}
+
+func writeJSONStatus(w http.ResponseWriter, code int, v any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(code)
+	_ = json.NewEncoder(w).Encode(v)
+}
+
+func postJSON(url string, v any) error {
+	b, _ := json.Marshal(v)
+	req, _ := http.NewRequest(http.MethodPost, url, bytes.NewReader(b))
+	req.Header.Set("Content-Type", "application/json")
+	c := &http.Client{Timeout: 3 * time.Second}
+	resp, err := c.Do(req)
+	if err != nil {
 		return err
 	}
+	resp.Body.Close()
 	return nil
 }
