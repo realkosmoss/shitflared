@@ -417,6 +417,14 @@ func StartServer(
 	}
 	connectorID := tunnelConfig.ClientConfig.ConnectorID
 
+	if quickTunnelURL != "" && quickURLSink != nil {
+		rid, _ := c.Context.Value("quick_request_id").(string)
+		if rid == "" {
+			rid = connectorID.String()
+		}
+		quickURLSink.OnQuickTunnelURL(rid, quickTunnelURL)
+	}
+
 	// Run connectivity pre-checks for cloudflared. This runs in a separate
 	// goroutine, as we want to keep initializing cloudflared while prechecks
 	// are running. Prechecks are controlled via DNS flag for remote kill-switch capability.

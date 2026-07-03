@@ -1,15 +1,19 @@
 package tunnel
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
+	"golang.org/x/net/proxy"
 
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/cliutil"
 	"github.com/cloudflare/cloudflared/cmd/cloudflared/flags"
@@ -28,11 +32,8 @@ func RunQuickTunnel(sc *subcommandContext) error {
 	sc.log.Info().Msg("Requesting new quick Tunnel on trycloudflare.com...")
 
 	client := http.Client{
-		Transport: &http.Transport{
-			TLSHandshakeTimeout:   httpTimeout,
-			ResponseHeaderTimeout: httpTimeout,
-		},
-		Timeout: httpTimeout,
+		Transport: newProxyAwareTransport(),
+		Timeout:   httpTimeout,
 	}
 
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/tunnel", sc.c.String("quick-service")), nil)
@@ -88,13 +89,32 @@ func RunQuickTunnel(sc *subcommandContext) error {
 
 	// Override the number of connections used. Quick tunnels shouldn't be used for production usage,
 	// so, use a single connection instead.
-	_ = sc.c.Set(flags.HaConnections, "1")
+	//_ = sc.c.Set(flags.HaConnections, "1") // ^^ Dont care
 	return StartServer(
 		sc.c,
 		buildInfo,
 		&connection.TunnelProperties{Credentials: credentials, QuickTunnelUrl: data.Result.Hostname},
 		sc.log,
 	)
+}
+
+func newProxyAwareTransport() *http.Transport {
+	baseDialer := &net.Dialer{Timeout: httpTimeout}
+	transport := &http.Transport{
+		TLSHandshakeTimeout:   httpTimeout,
+		ResponseHeaderTimeout: httpTimeout,
+	}
+
+	if allProxy := os.Getenv("ALL_PROXY"); allProxy != "" {
+		pd := proxy.FromEnvironmentUsing(baseDialer)
+		transport.DialContext = func(ctx context.Context, network, addr string) (net.Conn, error) {
+			return pd.Dial(network, addr)
+		}
+	} else if httpProxy := os.Getenv("HTTPS_PROXY"); httpProxy != "" {
+		transport.Proxy = http.ProxyFromEnvironment
+	}
+
+	return transport
 }
 
 type QuickTunnelResponse struct {
