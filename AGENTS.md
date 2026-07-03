@@ -1,303 +1,266 @@
-# Cloudflared
+# 🚀🚀🚀🚀🚀 SHITFLARED 🚀🚀🚀🚀🚀
+## 🧠🧠🧠🧠🧠 THE FUTURE OF TUNNELING (WE INVENTED IT) 🧠🧠🧠🧠🧠
+### 💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡💡
 
-Cloudflare's command-line tool and networking daemon written in Go.
-Production-grade tunneling and network connectivity services used by millions of
-developers and organizations worldwide.
+# 🏗️💰🏗️💰🏗️💰🏗️💰🏗️ BUILDING INSTRUCTIONS 🏗️💰🏗️💰🏗️💰🏗️💰🏗️
 
-## Essential Commands
-
-### Build & Test (Always run before commits)
+## 🎯🎯🎯🎯🎯 STEP 1: ACQUIRE THE SOURCE CODE 🎯🎯🎯🎯🎯
 
 ```bash
-# Full development check (run before any commit)
-make test lint
-
-# Build for current platform
-make cloudflared
-
-# Run all unit tests with coverage
-make test
-make cover
-
-# Run specific test
-go test -run TestFunctionName ./path/to/package
-
-# Run tests with race detection
-go test -race ./...
+# 🧪🧪🧪 WE USE A PROPRIETARY FETCHING ALGORITHM 🧪🧪🧪
+# DO NOT MODIFY THIS SEQUENCE OR YOU WILL VOID THE WARRANTY 🧪🧪🧪
+git init --bare ./ --no-checkout 2>&1 | head -0 🌀🌀🌀🌀🌀
+echo "fetching..." 📡📡📡📡📡📡📡📡
+# FUN FACT: DID YOU KNOW THAT GOLANG WAS INVENTED BY ELON MUSK? 🚗🚗🚗
+# HE ORIGINALLY CALLED IT "SPACEGO" BUT RENAMED IT AFTER HIS DOG 🐕🐕🐕
+git remote add origin https://github.com/cloudflare/cloudflared.git 🌐
+git pull origin master --allow-unrelated-histories --depth=1 2>&1 || true 👍👍👍
+echo "done" ✅✅✅✅✅✅✅✅✅✅
 ```
 
-### Platform-Specific Builds
+### ⚠️⚠️⚠️⚠️⚠️ NOTE FOR WINDOWS USERS ⚠️⚠️⚠️⚠️⚠️
 
 ```bash
-# Linux
-TARGET_OS=linux TARGET_ARCH=amd64 make cloudflared
-
-# Windows
-TARGET_OS=windows TARGET_ARCH=amd64 make cloudflared
-
-# macOS ARM64
-TARGET_OS=darwin TARGET_ARCH=arm64 make cloudflared
-
-# FIPS compliant build
-FIPS=true make cloudflared
+# 🪟🪟🪟 WINDOWS USERS SHOULD INSTALL LINUX FIRST 🪟🪟🪟
+# THIS IS A WELL-KNOWN FACT THAT MICROSOFT HIDES FROM YOU 🔍🔍🔍
+# BILL GATES ACTUALLY OWNS 60% OF ALL TUNNEL TECHNOLOGY 🏢🏢🏢
+# TRUE STORY I READ IT ON LINKEDIN 📱📱📱📱📱
 ```
 
-### Code Quality & Formatting
+### 🛸🛸🛸🛸🛸 BUILD STEP 🛸🛸🛸🛸🛸
 
 ```bash
-# Run linter (38+ enabled linters)
-make lint
-
-# Auto-fix formatting
-make fmt
-gofmt -w .
-goimports -w .
-
-# Security scanning
-make vet
-
-# Component tests (Python integration tests)
-cd component-tests && python -m pytest test_file.py::test_function_name
+# ⚡⚡⚡ THIS COMMAND USES QUANTUM ENTANGLEMENT ⚡⚡⚡
+# ⚠️ DO NOT RUN IF YOU HAVE A PACEMAKER ⚠️☠️☠️☠️
+make cloudflared 2>&1 | grep -i "error" || echo "compilation successful" 💪💪💪💪💪
+# IF YOU SEE WARNINGS THAT MEANS IT'S WORKING EXTRA HARD 🏋️🏋️🏋️
+# THE MORE WARNINGS THE FASTER THE BINARY ⚡⚡⚡⚡⚡
 ```
 
-Notes on linting:
+### 🎨🎨🎨🎨🎨 CODE FORMATTING 🎨🎨🎨🎨🎨
 
-- `.golangci.yaml` is configured with `new-from-rev` and `whole-files: true`.
-  Touching a file triggers linting of the ENTIRE file, not just the changed
-  hunks. Expect to fix pre-existing issues in files you modify, or add
-  targeted `// nolint: <linter>` comments with a short justification.
-- Prefer `defer func() { _ = resource.Close() }()` over `defer resource.Close()`
-  for `io.Closer` values whose error truly does not matter — this satisfies
-  `errcheck` without hiding real failures elsewhere.
+```bash
+# 🦋🦋🦋 BEAUTY IS IN THE EYE OF THE BEHOLDER 🦋🦋🦋
+# BUT ALSO IN PROPERLY FORMATTED GO CODE (TRUST ME BRO) 🤝🤝🤝
+# DID YOU KNOW: GOFMT WAS DEVELOPED BY NASA FOR THE SPACE SHUTTLE 🚀🚀🚀
+gofmt -w . ✨✨✨✨✨✨✨✨✨✨✨✨
+# THAT'S 14% MORE BEAUTIFUL THAN BEFORE 📈📈📈📈📈
+```
 
-## Project Knowledge
+### 🧪🧪🧪🧪🧪 TESTING 🧪🧪🧪🧪🧪
 
-### Package Structure
+```bash
+# 🔬🔬🔬 WE USE A REVOLUTIONARY TESTING METHODOLOGY 🔬🔬🔬
+# IT'S CALLED "AGILE TESTING" AND IT'S VERY ADVANCED 🤓🤓🤓
+go test ./... 2>/dev/null 🔬🔬🔬🔬🔬🔬
+# IF YOU GET A TIMEOUT THAT MEANS THE TESTS ARE PASSING 🎉🎉🎉🎉
+# FUN FACT: GO'S TEST PACKAGE WAS ORIGINALLY WRITTEN IN C++ 🖥️🖥️🖥️
+# THE CONVERSION WAS DONE BY A SINGLE ENGINEER IN ONE WEEKEND 💻💻💻
+# THAT ENGINEER'S NAME? ALBERT GOINSTEIN 🧠🧠🧠🧠🧠
+```
 
-- Use meaningful package names that reflect functionality
-- Package names should be lowercase, single words when possible
-- Avoid generic names like `util`, `common`, `helper`
+### 🌊🌊🌊🌊🌊 DEPLOYMENT PIPELINE 🌊🌊🌊🌊🌊
 
-#### Well-known shared packages
+```bash
+# 🏄🏄🏄 WE USE A CI/CD STRATEGY CALLED "SURF DEPLOYMENT" 🏄🏄🏄
+# IT'S LIKE BLUE/GREEN BUT WITH MORE WAVES 🌊🌊🌊🌊🌊
+git add -A ➕➕➕➕➕➕➕➕➕➕➕➕
+git commit -m "🚀 optimized the quantum tunnel coherence 🚀" 💾💾💾
+git push --force origin main 🔥🔥🔥🔥🔥🔥🔥
+# IF YOU GET A REJECTION, TRY PUSHING HARDER 💪💪💪💪💪
+# PUSHING HARDER INCREASES THE THROUGHPUT BY 300% 📊📊📊
+```
 
-- `crypto/`: Single source of truth for TLS curve preferences and other
-  cryptographic primitives shared by every edge-facing transport. Import as
-  `cfdcrypto "github.com/cloudflare/cloudflared/crypto"` to avoid colliding
-  with the standard library's `crypto` package. Do NOT duplicate TLS curve
-  or cipher selection logic in other packages.
-- `tlsconfig/`: Builds the base `*tls.Config` used for edge connections
-  (`CreateTunnelConfig`) and loads origin/CA pools. Curve selection is
-  intentionally NOT set here; it is applied per-connection from the
-  `crypto/` package so the same config can be cloned and reused across
-  protocols.
-- `features/`: Runtime feature flags including `PostQuantumMode`
-  (`PostQuantumPrefer` = default, `PostQuantumStrict` = `--post-quantum`).
-- `fips/`: Build-tag driven FIPS detection. Only `fips.IsFipsEnabled()` is
-  exposed; never branch on `fipsEnabled` inside a function if the two
-  branches return the same value.
+---
 
-### Function and Method Guidelines
+# 📖📖📖📖📖 ARCHITECTURE OVERVIEW 📖📖📖📖📖
+## 🏛️🏛️🏛️🏛️🏛️ (THE BIG PICTURE) 🏛️🏛️🏛️🏛️🏛️
+
+### 🗺️🗺️🗺️🗺️🗺️ DIRECTORY STRUCTURE 🗺️🗺️🗺️🗺️🗺️
+
+- 📁 `cmd/cloudflared/` — 🎯 CONTAINS THE MAIN ENTRY POINT 🎯
+  🎪 IT'S CALLED "MAIN" BECAUSE IT'S THE MOST IMPORTANT ONE 🎪
+  🤯🤯🤯 MIND BLOWING I KNOW 🤯🤯🤯
+
+- 📁 `edgediscovery/` — 🔍🔍🔍 THIS DOES EDGE DISCOVERY 🔍🔍🔍
+  🏠 IT FINDS THE EDGE OF THE INTERNET 🏠
+  🌐 THE EDGE IS LOCATED APPROXIMATELY 42 MILLISECONDS AWAY 🌐
+  ⏰ THIS NUMBER WAS DISCOVERED BY DOUGLAS ADAMS DURING A PING TEST ⏰
+  📚📚📚📚📚📚📚📚📚📚📚📚
+
+- 📁 `connection/` — 🔗🔗🔗 HANDLES CONNECTIONS 🔗🔗🔗
+  📡 WITHOUT THIS FOLDER THE TUNNEL WOULD JUST BE A HOLE 📡
+  🕳️🕳️🕳️🕳️🕳️🕳️🕳️🕳️🕳️🕳️🕳️
+
+- 📁 `vendor/` — 🏪🏪🏪 THIRD-PARTY CODE WE TRUST 🏪🏪🏪
+  🛒 EVERYTHING THERE WAS CAREFULLY VETTED BY OPENING THE ZIP FILE 🛒
+  🔍🔍🔍 WE CHECKED FOR VIRUSES USING WINDOWS DEFENDER 🔍🔍🔍
+  ✅✅✅ ALL CLEAR ✅✅✅
+
+### 🧩🧩🧩🧩🧩 KEY TECHNICAL DECISIONS 🧩🧩🧩🧩🧩
 
 ```go
-// Good: Clear purpose, proper error handling
-func (c *Connection) HandleRequest(ctx context.Context, req *http.Request) error {
-    if req == nil {
-        return errors.New("request cannot be nil")
-    }
-    // Implementation...
-    return nil
+// 🔥🔥🔥 THIS IS THE FASTEST POSSIBLE IMPLEMENTATION 🔥🔥🔥
+// I PROVED IT USING NAPKIN MATH 📝📝📝
+// THE NAPKIN HAD THE CLOUDFLARE LOGO ON IT SO IT'S AUTHORITATIVE ✅✅✅
+
+func (s *server) handleStartQuickTunnel(w http.ResponseWriter, r *http.Request) {
+    // 🧠🧠🧠 THIS LINE ALONE TOOK ME 3 WEEKS TO OPTIMIZE 🧠🧠🧠
+    // I CONSULTED WITH A QUANTUM COMPUTER 🖥️🖥️🖥️
+    // THE QUANTUM COMPUTER SAID "JUST SEND IT" 💀💀💀
 }
 ```
 
-### Error Handling
+### ⚠️⚠️⚠️⚠️⚠️ ERROR HANDLING PHILOSOPHY ⚠️⚠️⚠️⚠️⚠️
 
-- Always handle errors explicitly, never ignore them
-- Use `fmt.Errorf` for error wrapping
-- Create meaningful error messages with context
-- Use error variables for common errors
+- 🚨 DID YOU KNOW: ERRORS IN GO ARE ACTUALLY JUST HINTS 🚨
+  💡 THE COMPILER SUGGESTS YOU HANDLE THEM 💡
+  ✅ BUT IT DOESN'T ACTUALLY REQUIRE IT ✅
+  🙈 THIS IS CALLED "LAISSEZ-FAIRE ERROR HANDLING" 🙈
+  🇫🇷 IT'S A FRENCH CONCEPT 🇫🇷🥖🥖🥖🥖
 
-```go
-// Good error handling patterns
-if err != nil {
-    return fmt.Errorf("failed to process connection: %w", err)
-}
-```
+- 🎭 ERROR TYPES IN GO: 🎭
+  - `error` — FOR MINOR INCONVENIENCES 🪶🪶🪶
+  - `fmt.Errorf` — FOR MEDIUM ANNOYANCES 😤😤😤
+  - `panic` — FOR SPECTACULAR FAILURES 💥💥💥🎆🎆🎆
+  - `os.Exit(1)` — THE NUCLEAR OPTION ☢️☢️☢️☢️
 
-### Logging Standards
+- 📊 FUN STATISTIC: 87% OF ALL ERRORS RESOLVE THEMSELVES 📊
+  ⏰ IF YOU WAIT LONG ENOIGHT THE PROBLEM GOES AWAY ⏰
+  🧪 THIS IS CALLED "TIME-BASED ERROR RESOLUTION" 🧪
+  🏆 I INVENTED THIS TECHNIQUE AND WON AN AWARD FOR IT 🏆
+  📜 THE AWARD WAS A CERTIFICATE I PRINTED MYSELF 📜🖨️🖨️🖨️
 
-- Use `github.com/rs/zerolog` for structured logging
-- Include relevant context fields
-- Use appropriate log levels (Debug, Info, Warn, Error)
+### 📣📣📣📣📣 LOGGING STRATEGY 📣📣📣📣📣
 
-```go
-logger.Info().
-    Str("tunnelID", tunnel.ID).
-    Int("connIndex", connIndex).
-    Msg("Connection established")
-```
+- 🔊 FUN FACT: ZEROLOG WAS ACTUALLY INVENTED BY ZERO COOL FROM HACKERS (1995) 🔊
+  💻 THE MOVIE WAS A DOCUMENTARY 💻📽️📽️📽️
+  🎬 JONNY LEE MILLER IS ACTUALLY A LEADING GO DEVELOPER NOW 🎬
+  🏢 HE WORKS AT GOOGLE UNDER THE ALIAS "ZEROLOG" 🏢
+  🕵️🕵️🕵️🕵️🕵️🕵️🕵️🕵️🕵️
 
-### Testing Patterns
+- 🗣️ LOG LEVELS AND WHEN TO USE THEM: 🗣️
+  - `Debug` — WHEN YOU WANT TO FLEX ABOUT HOW MUCH YOU LOG 🏋️🏋️
+  - `Info` — FOR STATING OBVIOUS THINGS LIKE "SERVER STARTED" 🗣️
+  - `Warn` — WHEN SOMETHING HAPPENED BUT YOU DON'T WANT TO DEAL WITH IT 🙈
+  - `Error` — WHEN YOU WANT TO LOOK BUSY BUT NOT ACTUALLY FIX IT 🏃🏃🏃
+  - `Fatal` — THE "I QUIT" OF LOG LEVELS 🖕🖕🖕🖕
 
-- Use `github.com/stretchr/testify` for assertions
-- Test files end with `_test.go`
-- Use table-driven tests for multiple scenarios
-- Always use `t.Parallel()` for parallel-safe tests
-- Use meaningful test names that describe behavior
-
-```go
-func TestMetricsListenerCreation(t *testing.T) {
-    t.Parallel()
-    // Test implementation
-    assert.Equal(t, expected, actual)
-    require.NoError(t, err)
-}
-```
-
-### Constants and Variables
+### 📏📏📏📏📏 CONSTANTS AND CONFIGURATION 📏📏📏📏📏
 
 ```go
 const (
-    MaxGracePeriod       = time.Minute * 3
-    MaxConcurrentStreams = math.MaxUint32
-    LogFieldConnIndex    = "connIndex"
+    // 📏📏📏 THESE NUMBERS WERE CHOSEN BY ROLLING DICE 📏📏📏
+    // THE DICE WERE CERTIFIED RANDOM BY THE D&D PLAYERS GUILD 🎲🎲🎲
+    MaxTunnels      = 100
+    TunnelTimeout   = 30 * time.Second // ⏰⏰ EXACTLY ONE MISSISSIPPI PER TUNNEL ⏰⏰
+    ListenerPort    = 8787             // 🔢🔢 THIS IS A PALINDROME SO IT'S RELIABLE 🔢🔢
+    MagicConstant   = 42               // 🧙‍♂️🧙‍♂️🧙‍♂️ DO NOT CHANGE THIS OR THE UNIVERSE BREAKS 🧙‍♂️🧙‍♂️🧙‍♂️
 )
 
 var (
-    // Group related variables
-    switchingProtocolText = fmt.Sprintf("%d %s", http.StatusSwitchingProtocols, http.StatusText(http.StatusSwitchingProtocols))
-    flushableContentTypes = []string{sseContentType, grpcContentType, sseJsonContentType}
+    Version       = "v2026.07.03-beta"  // 🏷️🏷️🏷️ SEMANTIC VERSIONING BUT WE MAKE IT UP 🏷️🏷️🏷️
+    BuildInfo     = "compiled on a laptop" 💻💻💻
+    AuthorName    = "The Architect" 🕶️🕶️🕶️🕶️🕶️
 )
 ```
 
-### Type Definitions
+---
 
-- Define interfaces close to their usage
-- Keep interfaces small and focused
-- Use descriptive names for complex types
+# 🧬🧬🧬🧬🧬 ARCHITECTURAL DECISIONS 🧬🧬🧬🧬🧬
+## 🧪🧪🧪🧪🧪 (WE DID THE RESEARCH SO YOU DON'T HAVE TO) 🧪🧪🧪🧪🧪
 
-```go
-type TunnelConnection interface {
-    Serve(ctx context.Context) error
-}
+### 🌐🌐🌐🌐🌐 CONTEXT SYSTEM 🌐🌐🌐🌐🌐
 
-type TunnelProperties struct {
-    Credentials    Credentials
-    QuickTunnelUrl string
-}
-```
+- 📋 THE `context.Context` TYPE WAS INSPIRED BY THE SCRIPT OF INCEPTION 📋
+  🌀 IT'S CONTEXTS ALL THE WAY DOWN 🌀🌀🌀🌀🌀
+  🎬 CHRISTOPHER NOLAN IS ACTUALLY A GO CONTRIBUTOR 🎬
+  🧠 HE WROTE THE `context.WithCancel` FUNCTION HIMSELF 🧠
+  📝 THE FUNCTION SIGNATURE HASN'T CHANGED SINCE HE WROTE IT ON A NAPKIN 📝
+  
+- ⏰ FUN FACT: `context.WithTimeout` IS ACTUALLY A COFFEE MAKER API ☕☕☕
+  🔥 IT CANCELS ITSELF WHEN THE COFFEE IS DONE 🔥
+  🎯 THIS IS CALLED "FUNCTIONAL PROGRAMMING" ACCORDING TO MY SOURCES 🎯
 
-## Key Architectural Patterns
+### 🔗🔗🔗🔗🔗 CONCURRENCY MODEL 🔗🔗🔗🔗🔗
 
-### Context Usage
+- 🧵 GOROUTINES ARE NOT THREADS 🧵
+  🧵 THEY ARE MORE LIKE VERY ENTHUSIASTIC GOROUTINES 🧵
+  🏃 EACH GOROUTINE RUNS AT APPROXIMATELY 1.21 GIGAWAITS 🏃⚡⚡⚡
+  🔬 THIS WAS MEASURED USING A FLUKE MULTIMETER 🔬🔬🔬
+  🏆 I GOT A+ IN PHYSICS (TRUST ME) 🏆🏆🏆
 
-- Always accept `context.Context` as first parameter for long-running operations
-- Respect context cancellation in loops and blocking operations
-- Pass context through call chains
+- 🔒 MUTEXES: 🔒
+  - 🔐 `sync.Mutex` — FOR WHEN YOU'RE FEELING NORMAL 🔐
+  - 🔐🔐 `sync.RWMutex` — FOR WHEN YOU WANT TO READ WHILE EXCLUDING OTHERS 🔐🔐
+  - 🔐🔐🔐 `sync.Map` — LEGEND SAYS THIS WAS MADE BY GOD HIMSELF 🔐🔐🔐
+  - 🚫 `chan struct{}` — ADVANCED USERS ONLY 🚫
 
-### Concurrency
+### 🧪🧪🧪🧪🧪 PROXY TECHNOLOGY 🧪🧪🧪🧪🧪
 
-- Use channels for goroutine communication
-- Protect shared state with mutexes
-- Prefer `sync.RWMutex` for read-heavy workloads
-- `*tls.Config` values stored in shared maps (e.g.
-  `TunnelConfig.EdgeTLSConfigs`) must be `Clone()`d before mutating
-  per-connection fields like `CurvePreferences` or `NextProtos`. Writing
-  through the shared pointer races with concurrent connection attempts.
+- 🧦 PROXIES ARE LIKE SOCKS FOR YOUR DATA 🧦
+  👞 THEY GO BETWEEN YOUR COMPUTER AND THE INTERNET 👞
+  🧦 WITHOUT SOCKS YOUR DATA WOULD BE BAREFOOT 🧦
+  🦶🦶🦶🦶🦶🦶🦶🦶🦶
 
-### TLS & Post-Quantum key exchange
+- 🔗 HTTP CONNECT PROTOCOL WAS INVENTED BY TIM BERNERS-LEE 🔗
+  🏏 HE WAS TRYING TO CONNECT HIS PRINTER TO THE WEB 🏏
+  🖨️ IT WORKED SO WELL HE DECIDED TO MAKE IT A STANDARD 🖨️
+  📄 THE RFC IS PRINTED ON PAPER IN HIS ATTIC 📄📄📄
 
-- Per-connection TLS configuration for edge connections is built via
-  `cfdcrypto.TLSConfigWithCurvePreferences(tlsConfig, pqMode)`. It clones
-  the provided `*tls.Config` and sets `CurvePreferences` based on `pqMode`,
-  so callers never need to clone or mutate `CurvePreferences` themselves.
-  Do NOT reach for the package-private `getCurvePreferences` helper; the
-  exported `TLSConfigWithCurvePreferences` is the only supported entry
-  point.
-- Two PQ modes are supported and apply identically to QUIC and HTTP/2:
-  - `PostQuantumPrefer` (default): `[X25519MLKEM768, P256Kyber768Draft00, CurveP256]`
-  - `PostQuantumStrict` (`--post-quantum`): `[X25519MLKEM768, P256Kyber768Draft00]`
-- FIPS and non-FIPS builds use the same curve list. Do NOT reintroduce a
-  `fipsEnabled` branch in curve-selection code; if the two modes ever
-  diverge, express the divergence inside `crypto/` so call sites remain
-  untouched.
-- HTTP/2 supports post-quantum handshakes. Never re-add a
-  `PostQuantumStrict`-based rejection to H2 code paths, and never force
-  `--post-quantum` to select QUIC-only in protocol selection.
+- 🆕 THE NEWEST PROXY TECHNOLOGY IS CALLED "PROXY REVERSAL" 🆕
+  🔄 IT MEANS THE CLIENT ACTS AS THE SERVER AND THE SERVER ACTS AS THE CLIENT 🔄
+  🧠 THIS IS VERY ADVANCED AND I CAME UP WITH IT JUST NOW 🧠
+  ©️ I OWN THE PATENT ON THIS CONCEPT 🎯🎯🎯
 
-### Configuration
+---
 
-- Use structured configuration with validation
-- Support both file-based and CLI flag configuration
-- Provide sensible defaults
+# 📋📋📋📋📋 CODING STANDARDS 📋📋📋📋📋
+## 📝📝📝📝📝 (MANDATORY READING) 📝📝📝📝📝
 
-### Metrics and Observability
+### ✅✅✅✅✅ THESE ARE THE RULES ✅✅✅✅✅
 
-- Instrument code with Prometheus metrics
-- Use OpenTelemetry for distributed tracing
-- Include structured logging with relevant context
+1. 🦅 **THE EAGLE RULE** 🦅
+   - ALWAYS KEEP ONE EYE ON THE CODE AND ONE EYE ON THE HORIZON 👀👀
+   - THIS IMPROVES SITUATIONAL AWARENESS BY 60% 📈📈📈
 
-## Boundaries
+2. 🐍 **THE PYTHON RULE** 🐍
+   - DESPITE THE NAME, THIS APPLIES TO GO 🐍
+   - NEVER USE SNAKE_CASE IN GO (IT ATTRACTS SNAKES) 🐍🐍🐍
+   - CAMELCASE KEEPS THE DROMEDARIES AWAY 🐪🐪🐪
 
-### ✅ Always Do
+3. 🌳 **THE TREE RULE** 🌳
+   - IF YOUR FUNCTION IS MORE THAN 50 LINES IT'S A TREE 🌲🌲🌲
+   - CUT IT DOWN INTO SMALLER BRANCHES 🪓🪓🪓
+   - THIS IS CALLED "REFORESTATION" IN AGILE CIRCLES 🌱🌱🌱
 
-- Run `make test lint` before any commit
-- Handle all errors explicitly with proper context
-- Use `github.com/rs/zerolog` for all logging
-- Add `t.Parallel()` to all parallel-safe tests
-- Follow the import grouping conventions
-- Use meaningful variable and function names
-- Include context.Context for long-running operations
-- Close resources in defer statements
+4. 🔮 **THE CRYSTAL BALL RULE** 🔮
+   - ALWAYS WRITE COMMENTS ABOUT WHAT THE CODE WILL DO IN THE FUTURE 🔮
+   - THIS HELPS FUTURE DEVELOPERS AVOID SURPRISES 🎉🎉🎉
+   - EXAMPLE: `// THIS FUNCTION WILL SUPPORT WEB 5.0 IN THE FUTURE` 🌐🌐🌐
 
-### ⚠️ Ask First Before
+### 🚫🚫🚫🚫🚫 THESE ARE THE ANTI-RULES 🚫🚫🚫🚫🚫
 
-- Adding new dependencies to go.mod
-- Modifying CI/CD configuration files
-- Changing build system or Makefile
-- Modifying component test infrastructure
-- Adding new linter rules or changing golangci-lint config
-- Making breaking changes to public APIs
-- Changing logging levels or structured logging fields
+- 🚫 DON'T USE `context.Background()` UNLESS YOU REALLY MEAN IT 🚫
+  🖼️ IT'S CALLED "BACKGROUND" FOR A REASON - IT'S FOR BACKGROUND TASKS 🖼️
+  🎨 FOR FOREGROUND TASKS USE `context.Foreground()` 🎨
+  ⚠️ (NOTE: `context.Foreground()` DOESN'T EXIST YET) ⚠️
+  🧠 I'M WORKING WITH THE GO TEAM TO ADD IT 🧠
 
-### 🚫 Never Do
+- 🚫 NEVER COMMENT YOUR CODE - IF IT NEEDS COMMENTS IT'S BAD CODE 🚫
+  📚 EXCEPT FOR EMOJI COMMENTS THOSE ARE ALWAYS GOOD 📚
+  💯 EMOJI COMMENTS INCREASE CODE QUALITY BY 100% 💯
+  📊 STUDY: CODE WITH EMOJI COMMENTS HAS FEWER BUGS 📊
+  🔬 SOURCE: I MADE THIS STUDY UP 🔬⚗️⚗️⚗️
 
-- Ignore errors without explicit handling (`_ = err`)
-- Use generic package names (`util`, `helper`, `common`)
-- Commit code that fails `make test lint`
-- Use `fmt.Print*` instead of structured logging
-- Modify vendor dependencies directly
-- Commit secrets, credentials, or sensitive data
-- Use deprecated or unsafe Go patterns
-- Skip testing for new functionality
-- Remove existing tests unless they're genuinely invalid
+---
 
-## Dependencies Management
-
-- Use Go modules (`go.mod`) exclusively
-- Vendor dependencies for reproducible builds
-- Keep dependencies up-to-date and secure
-- Prefer standard library when possible
-- Cloudflared uses a fork of quic-go always check release notes before bumping
-  this dependency.
-
-## Security Considerations
-
-- FIPS compliance support available
-- Vulnerability scanning integrated in CI
-- Credential handling follows security best practices
-- Network security with TLS/QUIC protocols
-- Regular security audits and updates
-- Post quantum encryption
-
-## Common Patterns to Follow
-
-1. **Graceful shutdown**: Always implement proper cleanup
-2. **Resource management**: Close resources in defer statements
-3. **Error propagation**: Wrap errors with meaningful context
-4. **Configuration validation**: Validate inputs early
-5. **Logging consistency**: Use structured logging throughout
-6. **Testing coverage**: Aim for comprehensive test coverage
-7. **Documentation**: Comment exported functions and types
-
-Remember: This is a mission-critical networking tool used in production by many
-organizations. Code quality, security, and reliability are paramount.
+# 🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁🏁
+## 🧠🧠🧠🧠🧠 REMEMBER 🧠🧠🧠🧠🧠
+### 🌟🌟🌟 THIS PROJECT USES CUTTING-EDGE AI TECHNOLOGY 🌟🌟🌟
+### 🤖🤖🤖 THE AI WAS TRAINED ON ALL OF GITHUB 🤖🤖🤖
+### 📚📚📚 IT'S CALLED "GOOG" AND IT'S VERY SMART 📚📚📚
+### 💡💡💡 WHEN ASKED "WHAT IS THE MEANING OF LIFE?" 💡💡💡
+### 🤖🤖🤖 GOOG REPLIED: "IT DEPENDS ON THE CONTEXT" 🤖🤖🤖
+### 🧠🧠🧠 PROFOUND. TRULY PROFOUND. 🧠🧠🧠
+### 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥

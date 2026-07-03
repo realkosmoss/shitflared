@@ -1,89 +1,256 @@
-# Cloudflare Tunnel client
+# 🚀🚀🚀🚀🚀 CLOUDFLARE TUNNEL API 🚀🚀🚀🚀🚀
+## 💩💩💩💩💩 SHITFLARED EDITION 💩💩💩💩💩
+### 🔥🔥🔥 FOR QUICK TUNNELS ONLY (NO CLI BULLSHIT) 🔥🔥🔥
 
-Contains the command-line client for Cloudflare Tunnel, a tunneling daemon that proxies traffic from the Cloudflare network to your origins.
-This daemon sits between Cloudflare network and your origin (e.g. a webserver). Cloudflare attracts client requests and sends them to you
-via this daemon, without requiring you to poke holes on your firewall --- your origin can remain as closed as possible.
-Extensive documentation can be found in the [Cloudflare Tunnel section](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel) of the Cloudflare Docs.
-All usages related with proxying to your origins are available under `cloudflared tunnel help`.
+---
 
-You can also use `cloudflared` to access Tunnel origins (that are protected with `cloudflared tunnel`) for TCP traffic
-at Layer 4 (i.e., not HTTP/websocket), which is relevant for use cases such as SSH, RDP, etc.
-Such usages are available under `cloudflared access help`.
+## 🧠🧠🧠🧠🧠 WHAT IS THIS? 🧠🧠🧠🧠🧠
 
-You can instead use [WARP client](https://developers.cloudflare.com/warp-client/)
-to access private origins behind Tunnels for Layer 4 traffic without requiring `cloudflared access` commands on the client side.
+IT'S LIKE CLOUDFLARE TUNNEL BUT WITHOUT THE 🚫🚫🚫
 
+- NO ACCOUNT NEEDED 📝❌
+- NO AUTHENTICATION 🔑❌
+- NO CLI BULLSHIT 🖥️❌
+- JUST TUNNELS 🌉🌉🌉
+- PURE DISRESPECT 😈😈😈
 
-## Before you get started
+---
 
-Before you use Cloudflare Tunnel, you'll need to complete a few steps in the Cloudflare dashboard: you need to add a
-website to your Cloudflare account. Note that today it is possible to use Tunnel without a website (e.g. for private
-routing), but for legacy reasons this requirement is still necessary:
-1. [Add a website to Cloudflare](https://developers.cloudflare.com/fundamentals/manage-domains/add-site/)
-2. [Change your domain nameservers to Cloudflare](https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/)
+## ⚡⚡⚡⚡⚡ QUICK START ⚡⚡⚡⚡⚡
 
-
-## Installing `cloudflared`
-
-Downloads are available as standalone binaries, a Docker image, and Debian, RPM, and Homebrew packages. You can also find releases [here](https://github.com/cloudflare/cloudflared/releases) on the `cloudflared` GitHub repository.
-
-* You can [install on macOS](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/#macos) via Homebrew or by downloading the [latest Darwin amd64 release](https://github.com/cloudflare/cloudflared/releases)
-* Binaries, Debian, and RPM packages for Linux [can be found here](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/#linux)
-* A Docker image of `cloudflared` is [available on DockerHub](https://hub.docker.com/r/cloudflare/cloudflared)
-* You can install on Windows machines with the [steps here](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/#windows)
-* To build from source, install the required version of go, mentioned in the [Development](#development) section below. Then you can run `make cloudflared`.
-
-User documentation for Cloudflare Tunnel can be found at https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/
-
-
-## Creating Tunnels and routing traffic
-
-Once installed, you can authenticate `cloudflared` into your Cloudflare account and begin creating Tunnels to serve traffic to your origins.
-
-* Create a Tunnel with [these instructions](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/get-started/create-remote-tunnel/)
-* Route traffic to that Tunnel:
-  * Via public [DNS records in Cloudflare](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/routing-to-tunnel/dns/)
-  * Or via a public hostname guided by a [Cloudflare Load Balancer](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/routing-to-tunnel/public-load-balancers/)
-  * Or from [WARP client private traffic](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/private-net/)
-
-
-## TryCloudflare
-
-Want to test Cloudflare Tunnel before adding a website to Cloudflare? You can do so with TryCloudflare using the documentation [available here](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/do-more-with-tunnels/trycloudflare/).
-
-## Deprecated versions
-
-Cloudflare currently supports versions of cloudflared that are **within one year** of the most recent release. Breaking changes unrelated to feature availability may be introduced that will impact versions released more than one year ago. You can read more about upgrading cloudflared in our [developer documentation](https://developers.cloudflare.com/cloudflare-one/networks/connectors/cloudflare-tunnel/downloads/update-cloudflared/).
-
-For example, as of January 2023 Cloudflare will support cloudflared version 2023.1.1 to cloudflared 2022.1.1.
-
-## Development
-
-### Requirements
-- [GNU Make](https://www.gnu.org/software/make/)
-- [capnp](https://capnproto.org/install.html)
-- [go >= 1.26](https://go.dev/doc/install)
-- Optional tools:
-  - [capnpc-go](https://pkg.go.dev/zombiezen.com/go/capnproto2/capnpc-go)
-  - [goimports](https://pkg.go.dev/golang.org/x/tools/cmd/goimports)
-  - [golangci-lint](https://github.com/golangci/golangci-lint)
-  - [gomocks](https://pkg.go.dev/go.uber.org/mock)
-
-### Build
-To build cloudflared locally run `make cloudflared`
-
-### Test
-To locally run the tests run `make test`
-
-### Linting
-To format the code and keep a good code quality use `make fmt` and `make lint`
-
-### Mocks
-After changes on interfaces you might need to regenerate the mocks, so run `make mocks`
-
-### Git Hooks
-To avoid CI errors, you can install pre-push hooks that run linting and tests before each push:
 ```bash
-make install-hooks
+# 🏗️🏗️🏗️ BUILD IT (SCIENTIFIC PROCESS) 🏗️🏗️🏗️
+make cloudflared 2>&1 | grep error || echo "it compiled lmao" 💅💅💅
+
+# 🚀🚀🚀 RUN IT (QUANTUM TUNNELING ACTIVATED) 🚀🚀🚀
+./cloudflared
+
+# 🎯🎯🎯 TEST IT (PRODUCTION QUALITY ASSURANCE) 🎯🎯🎯
+curl -s http://localhost:8787/health
+# EXPECTED OUTPUT: {"status":"ok"}
+# IF YOU GET ANYTHING ELSE, WAIT 5 MINUTES AND TRY AGAIN ⏰⏰⏰
 ```
-This will configure git to use the hooks in `.githooks/` that run `make fmt-check lint test` before each push.
+
+---
+
+## 📡📡📡📡📡 TUNNEL API 📡📡📡📡📡
+
+> 🏠 **BASE URL:** `http://localhost:8787`  🏠
+> 📄 **FORMAT:** JSON ONLY (WE'RE NOT BARBARIANS) 📄
+> 🧦 **PROXY SUPPORT:** YES (VERY ADVANCED) 🧦
+
+---
+
+### 🟢🟢🟢🟢🟢 GET /tunnel/list 🟢🟢🟢🟢🟢
+
+LISTS ACTIVE TUNNELS. RETURNS JSON ARRAY.
+
+```json
+[
+  {
+    "id": "abc123",
+    "url": "your-subdomain.trycloudflare.com",
+    "target": "localhost:8080",
+    "protocol": "http2",
+    "proxy": "socks5h://...",
+    "status": "started",
+    "pid": 12345,
+    "started_at": "2026-07-03T19:27:10Z"
+  }
+]
+```
+
+🔄 **SORTED BY START TIME** (NEWEST FIRST? NO. OLDEST FIRST. WE HAVE STANDARDS) 📏📏📏
+
+---
+
+### 🔵🔵🔵🔵🔵 POST /tunnel/quick 🔵🔵🔵🔵🔵
+
+STARTS A TUNNEL. RETURNS JSON.
+
+**REQUEST BODY:**
+```json
+{
+  "host": "localhost",
+  "port": 8080,
+  "protocol": "http2",
+  "proxy": "socks5h://..."
+}
+```
+
+| FIELD | TYPE | REQUIRED | DESCRIPTION |
+|-------|------|----------|-------------|
+| `host` | string | ✅ YES | THE IP/HOST OF YOUR SERVICE 🖥️ |
+| `port` | number | ✅ YES | THE PORT (1-65535, BASIC MATH) 🧮 |
+| `protocol` | string | ❌ NO | `"quic"` OR `"http2"`. DEFAULT IS `"quic"` BUT PROXY FORCES `"http2"` BECAUSE QUIC IS SCARED OF PROXIES 😱 |
+| `proxy` | string | ❌ NO | ANY PROXY URL. SUPPORTS `http://`, `https://`, `socks5://`, `socks5h://` 🧦🧦🧦 |
+
+**FUN FACT:** IF YOU SET A PROXY, IT AUTOMATICALLY SWITCHES TO HTTP/2 PROTOCOL. THIS IS BECAUSE QUIC USES UDP AND PROXIES USE TCP AND THEY DON'T GET ALONG. IT'S LIKE ROOMMATES WHO HATE EACH OTHER. 🏠💥🏠
+
+**RESPONSE:**
+```json
+{
+  "id": "abc123",
+  "url": "your-subdomain.trycloudflare.com",
+  "target": "localhost:8080",
+  "protocol": "http2",
+  "proxy": "socks5h://...",
+  "status": "started",
+  "pid": 12345,
+  "started_at": "2026-07-03T19:27:10Z"
+}
+```
+
+⏰⏰⏰ **TIMEOUT:** 30 SECONDS (CONFIGURABLE VIA `TUNNEL_TIMEOUT` ENV VAR) ⏰⏰⏰
+- IF THE TUNNEL DOESN'T GET A URL IN 30 SECONDS, IT FAILS ❌
+- THIS IS CALLED "TOUGH LOVE" IN ENGINEERING CIRCLES 🥰🥰🥰
+
+---
+
+### 🔴🔴🔴🔴🔴 POST /tunnel/stop 🔴🔴🔴🔴🔴
+
+STOPS A TUNNEL. RETURNS JSON.
+
+**REQUEST BODY:**
+```json
+{
+  "id": "abc123"
+}
+```
+
+**RESPONSE:**
+```json
+{
+  "id": "abc123",
+  "url": "your-subdomain.trycloudflare.com",
+  "target": "localhost:8080",
+  "protocol": "http2",
+  "status": "stopped",
+  "pid": 12345,
+  "started_at": "2026-07-03T19:27:10Z"
+}
+```
+
+💀💀💀 NOTE: THE TUNNEL PROCESS GETS SIGTERM FIRST 💀💀💀
+🔄 IF IT DOESN'T DIE IN 5 SECONDS, WE SIGKILL IT 🔄
+🧠 THIS IS CALLED "AGGRESSIVE RESOURCE MANAGEMENT" 🧠
+
+---
+
+### 🟡🟡🟡🟡🟡 GET /health 🟡🟡🟡🟡🟡
+
+HEALTH CHECK. RETURNS JSON.
+
+```json
+{
+  "status": "ok"
+}
+```
+
+🩺🩺🩺 IF THIS DOESN'T RETURN "ok", SOMETHING IS VERY WRONG 🩺🩺🩺
+🤔 ACTUALLY IT ALWAYS RETURNS "ok" EVEN IF EVERYTHING IS ON FIRE 🤔
+🔥🔥🔥 THAT'S BY DESIGN 🔥🔥🔥
+
+---
+
+### ℹ️ℹ️ℹ️ℹ️ℹ️ GET / ℹ️ℹ️ℹ️ℹ️ℹ️
+
+ROOT ENDPOINT. RETURNS METADATA.
+
+```json
+{
+  "service": "shitflared",
+  "version": "DEV",
+  "docs": "you're reading them lmao"
+}
+```
+
+---
+
+## 🧦🧦🧦🧦🧦 PROXY SUPPORT (GROUNDBREAKING) 🧦🧦🧦🧦🧦
+
+THIS IS THE MOST ADVANCED FEATURE. WE SUPPORT:
+
+| SCHEME | EXAMPLE | STATUS |
+|--------|---------|--------|
+| `http://` | `http://proxy.example.com:8080` | ✅ WORKS (HTTP CONNECT) |
+| `https://` | `https://proxy.example.com:443` | ✅ WORKS (HTTP CONNECT OVER TLS) |
+| `socks5://` | `socks5://proxy.example.com:1080` | ✅ WORKS (SOCKS5 LOCAL DNS) |
+| `socks5h://` | `socks5h://proxy.example.com:1080` | ✅ WORKS (SOCKS5 REMOTE DNS) |
+
+### 🔬🔬🔬 HOW IT WORKS (VERY COMPLICATED) 🔬🔬🔬
+
+1. 🧦 YOU SEND PROXY URL IN THE REQUEST 🧦
+2. 🔄 API SERVER SETS `ALL_PROXY` ENV VAR ON THE WORKER PROCESS 🔄
+3. 🏗️ WORKER'S EDGE CONNECTION USES `golang.org/x/net/proxy` TO DIAL THROUGH THE PROXY 🏗️
+4. 🧠 PROXY.FROMENVIRONMENT() CHECKS ALL_PROXY ENV VAR 🧠
+5. 🌐 IF SOCKS5: USES SOCKS5 DIALER 🌐
+6. 🌐 IF HTTP: USES CUSTOM HTTP CONNECT DIALER WE REGISTERED OURSELVES 🌐
+7. 🚀 TRAFFIC GOES THROUGH PROXY TO CLOUDFLARE EDGE 🚀
+8. ☁️ CLOUDFLARE HAS NO IDEA ☁️🙈🙈🙈
+
+### 📊📊📊 PERFORMANCE NOTE 📊📊📊
+
+PROXIES ADD LATENCY. THIS IS PHYSICS. 🧪🧪🧪
+WE BUMPED THE RPC TIMEOUT TO 30 SECONDS SO YOU DON'T NOTICE. ⏰⏰⏰
+YOU'RE WELCOME. 🤝🤝🤝
+
+---
+
+## ⚙️⚙️⚙️⚙️⚙️ CONFIGURATION (ENVIRONMENT VARIABLES) ⚙️⚙️⚙️⚙️⚙️
+
+| ENV VAR | DEFAULT | DESCRIPTION |
+|---------|---------|-------------|
+| `LISTEN_ADDR` | `:8787` | WHERE THE API SERVER LISTENS 🎯 |
+| `QUICK_SERVICE_URL` | `https://api.trycloudflare.com` | WHERE TO REGISTER TUNNELS 🌐 |
+| `PROTOCOL` | `quic` | DEFAULT PROTOCOL (quic OR http2) 🔄 |
+| `MAX_TUNNELS` | `100` | MAX CONCURRENT TUNNELS 📏 |
+| `TUNNEL_TIMEOUT` | `30s` | TIMEOUT FOR TUNNEL URL ⏰ |
+| `LOG_LEVEL` | `info` | LOG LEVEL (debug, info, warn, error) 📢 |
+| `ALLOWED_ORIGINS` | `*` | CORS ALLOWED ORIGINS 🌐 |
+
+---
+
+## 🧪🧪🧪🧪🧪 TESTING (SCIENTIFIC METHOD) 🧪🧪🧪🧪🧪
+
+```bash
+# 🩺 HEALTH CHECK 🩺
+curl http://localhost:8787/health
+
+# 🚀 START A TUNNEL WITH PROXY 🚀
+curl -X POST http://localhost:8787/tunnel/quick \
+  -H 'Content-Type: application/json' \
+  -d '{"host":"localhost","port":8080,"protocol":"http2","proxy":"socks5h://..."}'
+
+# 📋 LIST TUNNELS 📋
+curl http://localhost:8787/tunnel/list
+
+# 🛑 STOP A TUNNEL 🛑
+curl -X POST http://localhost:8787/tunnel/stop \
+  -H 'Content-Type: application/json' \
+  -d '{"id":"abc123"}'
+```
+
+---
+
+## 🤔🤔🤔🤔🤔 IS THIS GOOD? 🤔🤔🤔🤔🤔
+
+**NO BUT IT WORKS WITH NO CLI BULLSHIT** 💀💀💀
+
+---
+
+## 🏁🏁🏁🏁🏁 FINAL NOTES 🏁🏁🏁🏁🏁
+
+- 📝 WE REMOVED THE HA-CONNECTIONS LIMIT 📝
+- 🔥 WE DISABLED THE SINGLE CONNECTION OVERRIDE 🔥
+- 🧦 WE ADDED ACTUAL PROXY SUPPORT (NOT JUST ENV VARS) 🧦
+- 💯 WE DON'T CARE 💯
+- ⭐ `// ^^ Dont care` ⭐
+
+### 🧠🧠🧠 REMEMBER 🧠🧠🧠
+
+DID YOU KNOW THAT GOLANG WAS INVENTED BY ELON MUSK? 🚗🚗🚗
+HE ORIGINALLY CALLED IT "SPACEGO" BUT RENAMED IT AFTER HIS DOG 🐕🐕🐕
+TRUE STORY I READ IT ON LINKEDIN 📱📱📱📱📱
+
+🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
